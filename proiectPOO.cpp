@@ -1,9 +1,159 @@
+#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cstring>
 #include <vector>
 #include <time.h>
+#include <sstream>
+#define DELETE_KEY 8
+#define ENTER_KEY 13
+#define ESCAPE_KEY 27
 
 using namespace std ;
+
+
+class Button {
+    sf::RectangleShape button ;
+    sf::Text text ;
+public:
+    Button() { }
+    Button(string t,sf::Vector2f size, int charSize, sf::Color bgColor, sf::Color textColor) {
+        text.setString(t);
+        text.setColor(textColor);
+        text.setCharacterSize(charSize);
+
+        button.setSize(size);
+        button.setFillColor(bgColor);
+
+    }
+    void setFont(sf::Font &font) {
+        text.setFont(font);
+    }
+    void setBackColor(sf::Color color){
+        button.setFillColor(color);
+    }
+    void setTextColor(sf::Color color){
+        text.setColor(color);
+    }
+    void setPosition(sf::Vector2f pos){
+        button.setPosition(pos);
+
+        float xPos, yPos;
+        xPos = (pos.x + button.getLocalBounds().width / 8) - (text.getLocalBounds().width / 2);
+        yPos = (pos.y + button.getLocalBounds().height / 4) - (text.getLocalBounds().height / 3);
+        text.setPosition(xPos,yPos);
+    }
+    void drawTo(sf::RenderWindow &window) {
+        window.draw(button);
+        window.draw(text);
+    }
+
+    bool isMouseOver(sf::RenderWindow &window) {
+        float mouseX = sf::Mouse::getPosition(window).x;
+        float mouseY = sf::Mouse::getPosition(window).y;
+
+        float btnPosX = button.getPosition().x ;
+        float btnPosY = button.getPosition().y;
+
+        float btnxPosWidth = button.getPosition().x + button.getLocalBounds().width;
+        float btnyPosHeight = button.getPosition().y + button.getLocalBounds().height;
+
+        if(mouseX < btnxPosWidth && mouseX > btnPosX && mouseY < btnyPosHeight && mouseY > btnPosY)
+            return true ;
+        return false ;
+    }
+};
+
+class TextBox {
+    sf::Text textbox;
+    ostringstream text;
+    bool isSelected = false ;
+    bool hasLimit = false ;
+    int limit ;
+    void inputLogic(int charTyped) {
+        if(charTyped != DELETE_KEY && charTyped != ENTER_KEY && charTyped != ESCAPE_KEY) {
+            text << static_cast<char>(charTyped);
+        }
+        else if (charTyped == DELETE_KEY){
+            if(text.str().length() > 0){
+                deleteLastChar();
+            }
+        }
+        textbox.setString(text.str() + "_");
+    }
+
+    void deleteLastChar() {
+        string t = text.str();
+        string newT = "";
+        for (int i = 0 ; i < t.length() - 1; ++i ){
+            newT += t[i] ;
+        }
+        text.str("");
+        text << newT ;
+
+        textbox.setString(text.str());
+    }
+
+public :
+    TextBox() {}
+    TextBox(int size, sf::Color color, bool sel) {
+        textbox.setCharacterSize(size);
+        textbox.setColor(color);
+        isSelected = sel ;
+        if(sel)
+            textbox.setString("_");
+        else
+            textbox.setString("");
+    }
+
+    void setFont(sf::Font &font) {
+        textbox.setFont(font);
+    }
+    void setPosition(sf::Vector2f pos){
+        textbox.setPosition(pos);
+    }
+    void setLimit(bool ToF) {
+        hasLimit = ToF ;
+    }
+    void setLimit(bool ToF, int lim) {
+        hasLimit = ToF ;
+        limit = lim ;
+    }
+    void setSelected(bool sel) {
+        isSelected = sel ;
+        if (!sel) {
+            string t = text.str();
+            string newT = "";
+            for (int i = 0 ; i < t.length() ; ++i ){
+                newT += t[i] ;
+            }
+            textbox.setString(newT);
+        }
+    }
+    string getText(){
+        return text.str();
+    }
+    void drawTo(sf::RenderWindow &window) {
+        window.draw(textbox);
+    }
+    void typedOn(sf::Event input) {
+        if(isSelected) {
+            int charTyped = input.text.unicode ;
+            if (charTyped < 128 ) {
+                if (hasLimit) {
+                    if (text.str().length() <= limit){
+                        inputLogic(charTyped) ;
+                    }
+                    else if (text.str().length() > limit && charTyped == DELETE_KEY) {
+                        deleteLastChar();
+                    }
+                }
+                else
+                    inputLogic(charTyped);
+            }
+        }
+    }
+
+};
 
 class persoana {
     string nume;
@@ -128,7 +278,7 @@ void baza_de_date::query(string name) {
             else
                 gender = "femeie";
             cout << "Nume : " << this->v[i].get_nume() << " - " << this->v[i].get_an_nastere() << " - " << gender
-                << '\n';
+                 << '\n';
         }
     if ( ct == 0 ) {
         cout << "In baza de date nu se afla persoane cu aceste atribute. Incercati din nou" ;
@@ -177,13 +327,13 @@ void baza_de_date::query(string name, int an) {
     string gender ;
     for (int i = 0 ; i < this->v.size(); ++i )
         if ( this->v[i].get_nume() == name &&  this->v[i].get_an_nastere() == an ) {
-                ct ++ ;
-                if (this->v[i].get_gen() == 'M')
-                    gender = "barbat";
-                else
-                    gender = "femeie";
-                cout << "Nume : " << this->v[i].get_nume() << " - " << this->v[i].get_an_nastere() << " - " << gender
-                     << '\n';
+            ct ++ ;
+            if (this->v[i].get_gen() == 'M')
+                gender = "barbat";
+            else
+                gender = "femeie";
+            cout << "Nume : " << this->v[i].get_nume() << " - " << this->v[i].get_an_nastere() << " - " << gender
+                 << '\n';
         }
     if ( ct == 0 ) {
         cout << "In baza de date nu se afla persoane cu aceste atribute. Incercati din nou" ;
@@ -267,8 +417,10 @@ ostream& operator << (ostream& out, baza_de_date& b) {
     return out;
 }
 
-int main() {
-    cout << "-----------Program gestiune baze de date-----------------" << endl;
+int main()
+{
+    /*
+     cout << "-----------Program gestiune baze de date-----------------" << endl;
     cout << "Operatii posibile : " << endl << "1. Adaugarea unui om in baza de date - prin codul de comanda -- add"
          << endl;
     cout << "2. Stergerea unui om din baza de date - prin codul de comanda -- delete" << endl;
@@ -465,5 +617,114 @@ int main() {
         else
             cout << "---------Cod invalid. Reia operatia------------ ";
     }
+     */
+    sf::RenderWindow window(sf::VideoMode(1280, 720), "Baza de date");
+    sf::Font font;
+    if( !font.loadFromFile("/Users/georgeboboc/Desktop/Proiecte/HelloSFML/arial.ttf") ) {
+        cout << "ERROR" ;
+    }
+    sf::Text text1 ,text2 , text3 , text4 ,text5;
+    text1.setFont(font);
+    text1.setString("---------------Program gestiune baze de date-----------------");
+    text1.setCharacterSize(48);
+    text1.setFillColor(sf::Color::White);
+    text1.setStyle(sf::Text::Bold);
 
+    TextBox textbox1(24, sf::Color::White, true);
+    textbox1.setFont(font) ;
+    textbox1.setPosition({450,100});
+
+    Button btn1("Adaugare", {200,100}, 32, sf::Color::Green, sf::Color::Black);
+    btn1.setPosition({100,100});
+    btn1.setFont(font);
+
+    Button btn2("Stergere", {200,100}, 32, sf::Color::Green, sf::Color::Black);
+    btn2.setPosition({100,225});
+    btn2.setFont(font);
+
+    Button btn3("Interogare", {200,100}, 32, sf::Color::Green, sf::Color::Black);
+    btn3.setPosition({100,350});
+    btn3.setFont(font);
+
+    Button btn4("Afisare BD", {200,100}, 32, sf::Color::Green, sf::Color::Black);
+    btn4.setPosition({100,475});
+    btn4.setFont(font);
+
+    static bool lock_click ;
+    persoana p;
+    baza_de_date b;
+    string nume_de_familie, prenume;
+    int an;
+    char gender;
+    p.set_nume("Gigel Frone");
+    p.set_an_nastere(2000);
+    p.set_gen('M');
+    b.adauga(p);
+    while (window.isOpen())
+    {
+        sf::Event event;
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+            textbox1.setSelected(true);
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+            textbox1.setSelected(false);
+        while (window.pollEvent(event))
+        {
+            switch (event.type) {
+                case sf::Event::Closed:
+                    window.close();
+                case sf::Event::TextEntered:
+                    textbox1.typedOn(event);
+                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+                        cout << textbox1.getText() ;
+                case sf::Event::MouseMoved:
+                    if(btn1.isMouseOver(window))
+                        btn1.setBackColor(sf::Color::White);
+                    else if (!btn1.isMouseOver(window))
+                        btn1.setBackColor(sf::Color::Green);
+                    if(btn2.isMouseOver(window))
+                        btn2.setBackColor(sf::Color::White);
+                    else if (!btn2.isMouseOver(window))
+                        btn2.setBackColor(sf::Color::Green);
+                    if(btn3.isMouseOver(window))
+                        btn3.setBackColor(sf::Color::White);
+                    else if (!btn3.isMouseOver(window))
+                        btn3.setBackColor(sf::Color::Green);
+                    if(btn4.isMouseOver(window))
+                        btn4.setBackColor(sf::Color::White);
+                    else if (!btn4.isMouseOver(window))
+                        btn4.setBackColor(sf::Color::Green);
+                case sf::Event::MouseButtonPressed:
+                    if (event.mouseButton.button == sf::Mouse::Left && lock_click != true) {
+                        if(btn1.isMouseOver(window)) {
+                            cout << "Introduceti numele de familie al persoanei : " << " ";
+                            cin >> nume_de_familie;
+                            cout << "Introduceti prenumele persoanei : " << " ";
+                            cin >> prenume;
+                            p.set_nume(nume_de_familie + " " + prenume);
+                            cout << "Introduceti anul nasterii persoanei : " << " ";
+                            cin >> an;
+                            p.set_an_nastere(an);
+                            cout << "Introduceti genul persoanei : " << " ";
+                            cin >> gender;
+                            p.set_gen(gender);
+                            b.adauga(p);
+                            cout << "Adaugat cu succes";
+                        }
+                        if(btn4.isMouseOver(window)){
+                            cout << b ;
+                        }
+                        lock_click = true ;
+                    }
+            }
+        }
+        window.clear();
+        window.draw(text1);
+        textbox1.drawTo(window);
+        btn1.drawTo(window);
+        btn2.drawTo(window);
+        btn3.drawTo(window);
+        btn4.drawTo(window);
+        window.display();
+    }
 }

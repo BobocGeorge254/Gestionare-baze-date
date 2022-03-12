@@ -132,8 +132,21 @@ public :
     string getText(){
         return text.str();
     }
-    void drawTo(sf::RenderWindow &window) {
+    void drawTo(sf::RenderWindow &window, sf::Vector2f pos) {
+        textbox.setPosition(pos);
         window.draw(textbox);
+    }
+    void printConsole(sf::RenderWindow &window, string text, sf::Vector2f pos) {
+        sf::Font font;
+        sf::Text text1;
+        if( !font.loadFromFile("/Users/georgeboboc/Desktop/Proiecte/HelloSFML/arial.ttf") ) {
+            cout << "ERROR" ;
+        }
+        text1.setString(text);
+        text1.setFont(font);
+        text1.setCharacterSize(24);
+        text1.setPosition(pos.x,pos.y);
+        window.draw(text1);
     }
     void typedOn(sf::Event input) {
         if(isSelected) {
@@ -632,7 +645,15 @@ int main()
 
     TextBox textbox1(24, sf::Color::White, true);
     textbox1.setFont(font) ;
-    textbox1.setPosition({450,100});
+    textbox1.setPosition({850,100});
+
+    TextBox textbox2(24, sf::Color::White, true);
+    textbox2.setFont(font) ;
+    textbox2.setPosition({750,125});
+
+    TextBox textbox(24, sf::Color::White, true);
+    textbox.setFont(font) ;
+    textbox.setPosition({450,100});
 
     Button btn1("Adaugare", {200,100}, 32, sf::Color::Green, sf::Color::Black);
     btn1.setPosition({100,100});
@@ -697,6 +718,7 @@ int main()
                 case sf::Event::MouseButtonPressed:
                     if (event.mouseButton.button == sf::Mouse::Left && lock_click != true) {
                         if(btn1.isMouseOver(window)) {
+                            /*
                             cout << "Introduceti numele de familie al persoanei : " << " ";
                             cin >> nume_de_familie;
                             cout << "Introduceti prenumele persoanei : " << " ";
@@ -710,9 +732,29 @@ int main()
                             p.set_gen(gender);
                             b.adauga(p);
                             cout << "Adaugat cu succes";
+                             */
+                            bool loop = true ;
+                            while ( loop ) {
+                                //cout << "PL";
+                                window.clear();
+                                window.draw(text1);
+                                textbox1.drawTo(window,{850,200});
+                                textbox.printConsole(window, "Introduceti numele de familie al persoanei : " , {350,200});
+                                nume_de_familie = textbox.getText();
+                                textbox.printConsole(window, "Introduceti prenumele persoanei : " , {457,227});
+                                prenume = textbox.getText();
+                                p.set_nume(nume_de_familie + " " + prenume) ;
+                                textbox.printConsole(window, "Introduceti anul nasterii persoanei : " , {437, 254} ) ;
+                                textbox.printConsole(window,"Introduceti genul persoanei (M/F) : ", {447,281}) ;
+                                btn1.drawTo(window);
+                                btn2.drawTo(window);
+                                btn3.drawTo(window);
+                                btn4.drawTo(window);
+                                window.display();
+                            }
                         }
                         if(btn4.isMouseOver(window)){
-                            cout << b ;
+                            cout << "OK" ;
                         }
                         lock_click = true ;
                     }
@@ -720,7 +762,8 @@ int main()
         }
         window.clear();
         window.draw(text1);
-        textbox1.drawTo(window);
+        //textbox1.drawTo(window);
+        //textbox1.printConsole(window, "Hello world", {500,300});
         btn1.drawTo(window);
         btn2.drawTo(window);
         btn3.drawTo(window);

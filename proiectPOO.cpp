@@ -1,172 +1,19 @@
-#include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cstring>
 #include <vector>
+#include <stdlib.h>
 #include <time.h>
-#include <sstream>
-#define DELETE_KEY 8
-#define ENTER_KEY 13
-#define ESCAPE_KEY 27
 
 using namespace std ;
 
-
-class Button {
-    sf::RectangleShape button ;
-    sf::Text text ;
-public:
-    Button() { }
-    Button(string t,sf::Vector2f size, int charSize, sf::Color bgColor, sf::Color textColor) {
-        text.setString(t);
-        text.setColor(textColor);
-        text.setCharacterSize(charSize);
-
-        button.setSize(size);
-        button.setFillColor(bgColor);
-
+int atoi(string s){
+    int numar = 0 , p = 1 ;
+    for (int i = s.size() - 1 ; i >= 0 ; --i ){
+        numar += p * ( s[i] - '0' );
+        p *= 10;
     }
-    void setFont(sf::Font &font) {
-        text.setFont(font);
-    }
-    void setBackColor(sf::Color color){
-        button.setFillColor(color);
-    }
-    void setTextColor(sf::Color color){
-        text.setColor(color);
-    }
-    void setPosition(sf::Vector2f pos){
-        button.setPosition(pos);
-
-        float xPos, yPos;
-        xPos = (pos.x + button.getLocalBounds().width / 8) - (text.getLocalBounds().width / 2);
-        yPos = (pos.y + button.getLocalBounds().height / 4) - (text.getLocalBounds().height / 3);
-        text.setPosition(xPos,yPos);
-    }
-    void drawTo(sf::RenderWindow &window) {
-        window.draw(button);
-        window.draw(text);
-    }
-
-    bool isMouseOver(sf::RenderWindow &window) {
-        float mouseX = sf::Mouse::getPosition(window).x;
-        float mouseY = sf::Mouse::getPosition(window).y;
-
-        float btnPosX = button.getPosition().x ;
-        float btnPosY = button.getPosition().y;
-
-        float btnxPosWidth = button.getPosition().x + button.getLocalBounds().width;
-        float btnyPosHeight = button.getPosition().y + button.getLocalBounds().height;
-
-        if(mouseX < btnxPosWidth && mouseX > btnPosX && mouseY < btnyPosHeight && mouseY > btnPosY)
-            return true ;
-        return false ;
-    }
-};
-
-class TextBox {
-    sf::Text textbox;
-    ostringstream text;
-    bool isSelected = false ;
-    bool hasLimit = false ;
-    int limit ;
-    void inputLogic(int charTyped) {
-        if(charTyped != DELETE_KEY && charTyped != ENTER_KEY && charTyped != ESCAPE_KEY) {
-            text << static_cast<char>(charTyped);
-        }
-        else if (charTyped == DELETE_KEY){
-            if(text.str().length() > 0){
-                deleteLastChar();
-            }
-        }
-        textbox.setString(text.str() + "_");
-    }
-
-    void deleteLastChar() {
-        string t = text.str();
-        string newT = "";
-        for (int i = 0 ; i < t.length() - 1; ++i ){
-            newT += t[i] ;
-        }
-        text.str("");
-        text << newT ;
-
-        textbox.setString(text.str());
-    }
-
-public :
-    TextBox() {}
-    TextBox(int size, sf::Color color, bool sel) {
-        textbox.setCharacterSize(size);
-        textbox.setColor(color);
-        isSelected = sel ;
-        if(sel)
-            textbox.setString("_");
-        else
-            textbox.setString("");
-    }
-
-    void setFont(sf::Font &font) {
-        textbox.setFont(font);
-    }
-    void setPosition(sf::Vector2f pos){
-        textbox.setPosition(pos);
-    }
-    void setLimit(bool ToF) {
-        hasLimit = ToF ;
-    }
-    void setLimit(bool ToF, int lim) {
-        hasLimit = ToF ;
-        limit = lim ;
-    }
-    void setSelected(bool sel) {
-        isSelected = sel ;
-        if (!sel) {
-            string t = text.str();
-            string newT = "";
-            for (int i = 0 ; i < t.length() ; ++i ){
-                newT += t[i] ;
-            }
-            textbox.setString(newT);
-        }
-    }
-    string getText(){
-        return text.str();
-    }
-    void drawTo(sf::RenderWindow &window, sf::Vector2f pos) {
-        textbox.setPosition(pos);
-        window.draw(textbox);
-    }
-    void printConsole(sf::RenderWindow &window, string text, sf::Vector2f pos) {
-        sf::Font font;
-        sf::Text text1;
-        if( !font.loadFromFile("/Users/georgeboboc/Desktop/Proiecte/HelloSFML/arial.ttf") ) {
-            cout << "ERROR" ;
-        }
-        text1.setString(text);
-        text1.setFont(font);
-        text1.setCharacterSize(24);
-        text1.setPosition(pos.x,pos.y);
-        window.draw(text1);
-    }
-    void typedOn(sf::Event input) {
-        if(isSelected) {
-            int charTyped = input.text.unicode ;
-            if (charTyped < 128 ) {
-                if (hasLimit) {
-                    if (text.str().length() <= limit){
-                        inputLogic(charTyped) ;
-                    }
-                    else if (text.str().length() > limit && charTyped == DELETE_KEY) {
-                        deleteLastChar();
-                    }
-                }
-                else
-                    inputLogic(charTyped);
-            }
-        }
-    }
-
-};
+    return numar ;
+}
 
 class persoana {
     string nume;
@@ -231,6 +78,7 @@ public :
     void query(int, char);
     void query(string, int, char);
     friend ostream& operator << (ostream&, baza_de_date&) ;
+
 };
 
 void baza_de_date::adauga(persoana p) {
@@ -430,41 +278,69 @@ ostream& operator << (ostream& out, baza_de_date& b) {
     return out;
 }
 
-int main()
-{
+void AfisareInformatii(){
+    cout << endl << "Operatii posibile : " << endl << "1. Adaugarea unui om in baza de date - prin codul de comanda -- add"
+         << endl;
+    cout << "2. Stergerea unui om din baza de date - prin codul de comanda -- delete" << endl;
+    cout << "3. Interogarea bazei de date - prin codul de comanda -- query" << endl;
+    cout << "4. Afisarea bazei de date - prin codul de comanda -- print" << endl ;
+    cout << "5.Inchidere aplicatie - print codul de comanda -- exit" << endl ;
+}
+
+int main() {
     /*
-     cout << "-----------Program gestiune baze de date-----------------" << endl;
-    cout << "Operatii posibile : " << endl << "1. Adaugarea unui om in baza de date - prin codul de comanda -- add"
+    cout << "-----------Program gestiune baze de date-----------------" << endl;
+    cout << endl << "Operatii posibile : " << endl << "1. Adaugarea unui om in baza de date - prin codul de comanda -- add"
          << endl;
     cout << "2. Stergerea unui om din baza de date - prin codul de comanda -- delete" << endl;
     cout << "3. Interogarea bazei de date - prin codul de comanda -- query" << endl;
     cout << "4. Afisarea bazei de date - print codul de comanda -- print" << endl ;
-    string comanda, nume_de_familie, prenume, cod, cod1, cod2 ;
+    cout << "5.Inchidere aplicatie - print codul de comanda -- exit" << endl ;
+    string comanda, nume_de_familie, prenume, cod, cod1, cod2, an_string;
+    int an;
     persoana p;
     baza_de_date b;
-    int an;
     char gender;
     while (true) {
         cout << endl << "Introduceti codul operatiei : ";
         cin >> comanda;
-        if (comanda == "exit") {
+        if (comanda == "exit" || comanda == "EXIT") {
             break;
         }
         else if (comanda == "add") {
             cout << "Introduceti numele de familie al persoanei : " << " ";
             cin >> nume_de_familie;
+            //cin>>p.nume_de_familie;
             cout << "Introduceti prenumele persoanei : " << " ";
             cin >> prenume;
             p.set_nume(nume_de_familie + " " + prenume);
             cout << "Introduceti anul nasterii persoanei : " << " ";
-            cin >> an;
-            p.set_an_nastere(an);
-            cout << "Introduceti genul persoanei : " << " ";
-            cin >> gender;
-            p.set_gen(gender);
-            b.adauga(p);
+            cin >> an_string;
+            bool ok = true ;
+            for (int i = 0 ; i <an_string.size(); ++i)
+                if (an_string[i] < '0' || an_string[i] > '9')
+                    ok = false ;
+            if (ok == true) {
+                an = atoi(an_string) ;
+                p.set_an_nastere(an);
+                cout << "Introduceti genul persoanei (M/F) : " << " ";
+                cin >> gender;
+                if (gender != 'M' && gender != 'F') {
+                    cout << "---------Invalid. Reia operatia------------ ";
+                    AfisareInformatii();
+                } else {
+                    p.set_gen(gender);
+                    b.adauga(p);
+                    cout << endl << "---------Adaugat cu succes-----------" << endl;
+                    AfisareInformatii();
+                }
+            }
+            else {
+                cout << "---------Invalid. Reia operatia------------ ";
+                AfisareInformatii();
+            }
         }
-        else if (comanda == "delete") {
+        else if (comanda == "delete" || comanda == "DELETE") {
             int numar;
             cout << "------Optiuni de stergere---------" << endl;
             cout << "Stergerea unei persoane dupa nume - prin codul de comanda -- nume" << endl;
@@ -482,19 +358,38 @@ int main()
                     cout << "Introduceti prenumele persoanei/persoanelor pe care vrei sa le elimini : ";
                     cin >> prenume;
                     b.sterge(nume_de_familie + " " + prenume);
+                    cout << "-----------------Stergere realizata cu succes------------------";
+                    AfisareInformatii() ;
 
                 } else if (cod == "an") {
                     cout << "Introduceti anul de nastere persoanei/persoanelor pe care vrei sa le elimini : ";
-                    cin >> an;
-                    b.sterge(an);
+                    cin >> an_string;
+                    bool ok = true ;
+                    for (int i = 0 ; i <an_string.size(); ++i)
+                        if (an_string[i] < '0' || an_string[i] > '9')
+                            ok = false ;
+                    if ( ok == true ) {
+                        an = atoi(an_string);
+                        b.sterge(an);
+                        cout << "-----------------Stergere realizata cu succes------------------";
+                        AfisareInformatii();
+                    }
+                    else {
+                        cout << "---------Invalid. Reia operatia------------ ";
+                        AfisareInformatii();
+                    }
 
                 } else if (cod == "gen") {
-                    cout << "Introduceti genul al persoanei/persoanelor pe care vrei sa le elimini : ";
+                    cout << "Introduceti genul al persoanei/persoanelor pe care vrei sa le elimini (M/F): ";
                     cin >> gender;
                     b.sterge(gender);
+                    cout << "-----------------Stergere realizata cu succes------------------";
+                    AfisareInformatii() ;
 
-                } else
+                } else {
                     cout << "---------Cod invalid. Reia operatia------------ ";
+                    AfisareInformatii();
+                }
             }
             else if (numar == 2) {
                 cout << "Introduceti primul atribut dupa care doriti sa se faca stergerea : " ;
@@ -507,27 +402,58 @@ int main()
                     cout << "Introduceti prenumele persoanei/persoanelor pe care vrei sa le elimini : ";
                     cin >> prenume;
                     cout << "Introduceti anul de nastere persoanei/persoanelor pe care vrei sa le elimini : ";
-                    cin >> an;
-                    b.sterge(nume_de_familie + " " + prenume, an) ;
+                    cin >> an_string ;
+                    bool ok = true ;
+                    for (int i = 0 ; i <an_string.size(); ++i)
+                        if (an_string[i] < '0' || an_string[i] > '9')
+                            ok = false ;
+                    if (ok == true) {
+                        an = atoi(an_string);
+                        b.sterge(nume_de_familie + " " + prenume, an);
+                        cout << "-----------------Stergere realizata cu succes------------------";
+                        AfisareInformatii();
+                    }
+                    else {
+                        cout << "------------Invalid. Reia operatia------------ ";
+                        AfisareInformatii();
+                    }
+
                 }
                 else if ( (cod1 == "nume" && cod2 == "gen") || (cod2 == "nume" && cod1 == "gen")) {
                     cout << "Introduceti numele de familie al persoanei/persoanelor pe care vrei sa le elimini  : ";
                     cin >> nume_de_familie;
                     cout << "Introduceti prenumele persoanei/persoanelor pe care vrei sa le elimini : ";
                     cin >> prenume;
-                    cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le elimini : ";
+                    cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le elimini (M/F): ";
                     cin >> gender;
                     b.sterge(nume_de_familie + " " + prenume, gender) ;
+                    cout << "-----------------Stergere realizata cu succes------------------";
+                    AfisareInformatii() ;
                 }
                 else if ( (cod1 == "an" && cod2 == "gen") || (cod2 == "an" && cod1 == "gen")) {
                     cout << "Introduceti anul de nastere persoanei/persoanelor pe care vrei sa le elimini : ";
-                    cin >> an;
-                    cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le elimini : ";
-                    cin >> gender;
-                    b.sterge(an, gender) ;
+                    cin >> an_string;
+                    bool ok = true ;
+                    for (int i = 0 ; i <an_string.size(); ++i)
+                        if (an_string[i] < '0' || an_string[i] > '9')
+                            ok = false ;
+                    if ( ok == true ) {
+                        an = atoi(an_string);
+                        cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le elimini (M/F): ";
+                        cin >> gender;
+                        b.sterge(an, gender);
+                        cout << "-----------------Stergere realizata cu succes------------------";
+                        AfisareInformatii();
+                    }
+                    else {
+                        cout << "------------Invalid. Reia operatia------------ ";
+                        AfisareInformatii();
+                    }
                 }
-                else
+                else {
                     cout << "---------Cod invalid. Reia operatia------------ ";
+                    AfisareInformatii();
+                }
             }
             else if (numar == 3) {
                 cout << "Introduceti numele de familie al persoanei/persoanelor pe care vrei sa le elimini  : ";
@@ -535,21 +461,38 @@ int main()
                 cout << "Introduceti prenumele persoanei/persoanelor pe care vrei sa le elimini : ";
                 cin >> prenume;
                 cout << "Introduceti anul de nastere persoanei/persoanelor pe care vrei sa le elimini : ";
-                cin >> an;
-                cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le elimini : ";
-                cin >> gender;
-                b.sterge(nume_de_familie + " " + prenume, an, gender) ;
+                cin >> an_string;
+                bool ok = true ;
+                for (int i = 0 ; i <an_string.size(); ++i)
+                    if (an_string[i] < '0' || an_string[i] > '9')
+                        ok = false ;
+                if ( ok == true ) {
+                    an = atoi(an_string) ;
+                    cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le elimini (M/F): ";
+                    cin >> gender;
+                    b.sterge(nume_de_familie + " " + prenume, an, gender);
+                    cout << "-----------------Stergere realizata cu succes------------------";
+                    AfisareInformatii();
+                }
+                else {
+                    cout << "------------Invalid. Reia operatia------------ ";
+                    AfisareInformatii();
+                }
             }
-            else
-                cout << "---------Numar invalid de atribute. Reia operatia---------" ;
+            else {
+                cout << "---------Numar invalid de atribute. Reia operatia---------";
+                AfisareInformatii();
+            }
         }
-        else if (comanda == "print") {
+        else if (comanda == "print" || comanda == "PRINT") {
             cout << endl;
             cout << b;
+            cout << endl ;
+            AfisareInformatii() ;
         }
-        else if (comanda == "query") {
+        else if (comanda == "query" || comanda == "QUERY") {
             int numar ;
-            cout << "-----------Optiuni de interogare-------------";
+            cout << "-----------Optiuni de interogare-------------" << endl ;
             cout << "Interogarea unei persoane dupa nume - prin codul de comanda -- nume" << endl;
             cout << "Interogare unei persoane dupa anul nasterii - prin codul de comanda -- an" << endl;
             cout << "Interogarea unei persoane dupa gen - prin codul de comanda -- gen " << endl;
@@ -565,52 +508,88 @@ int main()
                     cout << "Introduceti prenumele persoanei/persoanelor pe care vrei sa le interoghezi : ";
                     cin >> prenume;
                     b.query(nume_de_familie + " " + prenume);
+                    AfisareInformatii() ;
 
                 } else if (cod == "an") {
+
                     cout << "Introduceti anul de nastere persoanei/persoanelor pe care vrei sa le interoghezi : ";
-                    cin >> an;
-                    b.query(an);
+                    cin >> an_string;
+                    bool ok = true ;
+                    for (int i = 0 ; i <an_string.size(); ++i)
+                        if (an_string[i] < '0' || an_string[i] > '9')
+                            ok = false ;
+                    if ( ok == true ) {
+                        an = atoi(an_string) ;
+                        b.query(an);
+                        AfisareInformatii() ;
+                    }
+                    else {
+                        cout << "------------Invalid. Reia operatia------------ ";
+                        AfisareInformatii();
+                    }
 
                 } else if (cod == "gen") {
-                    cout << "Introduceti genul al persoanei/persoanelor pe care vrei sa le interoghezi : ";
+                    cout << "Introduceti genul al persoanei/persoanelor pe care vrei sa le interoghezi (M/F) : ";
                     cin >> gender;
                     b.query(gender);
+                    AfisareInformatii() ;
 
-                } else
+                } else {
                     cout << "---------Cod invalid. Reia operatia------------ ";
+                    AfisareInformatii();
+                }
             }
             else if (numar == 2) {
-                cout << "Introduceti primul atribut dupa care doriti sa se faca interogarea : " ;
-                cin >> cod1 ;
-                cout << "Introduceti al doilea atribut dupa care doriti sa se faca interogarea : " ;
-                cin >> cod2 ;
-                if ( (cod1 == "nume" && cod2 == "an") || (cod2 == "nume" && cod1 == "an")) {
+                cout << "Introduceti primul atribut dupa care doriti sa se faca interogarea : ";
+                cin >> cod1;
+                cout << "Introduceti al doilea atribut dupa care doriti sa se faca interogarea : ";
+                cin >> cod2;
+                if ((cod1 == "nume" && cod2 == "an") || (cod2 == "nume" && cod1 == "an")) {
                     cout << "Introduceti numele de familie al persoanei/persoanelor pe care vrei sa le interoghezi  : ";
                     cin >> nume_de_familie;
                     cout << "Introduceti prenumele persoanei/persoanelor pe care vrei sa le interoghezi : ";
                     cin >> prenume;
                     cout << "Introduceti anul de nastere persoanei/persoanelor pe care vrei sa le interoghezi : ";
-                    cin >> an;
-                    b.query(nume_de_familie + " " + prenume, an) ;
-                }
-                else if ( (cod1 == "nume" && cod2 == "gen") || (cod2 == "nume" && cod1 == "gen")) {
+                    cin >> an_string;
+                    bool ok = true;
+                    for (int i = 0; i < an_string.size(); ++i)
+                        if (an_string[i] < '0' || an_string[i] > '9')
+                            ok = false;
+                    if (ok == true) {
+                        an = atoi(an_string);
+                        b.query(nume_de_familie + " " + prenume, an);
+                        AfisareInformatii();
+                    } else {
+                        cout << "------------Invalid. Reia operatia------------ ";
+                        AfisareInformatii();
+                    }
+                } else if ((cod1 == "nume" && cod2 == "gen") || (cod2 == "nume" && cod1 == "gen")) {
                     cout << "Introduceti numele de familie al persoanei/persoanelor pe care vrei sa le interoghezi  : ";
                     cin >> nume_de_familie;
                     cout << "Introduceti prenumele persoanei/persoanelor pe care vrei sa le interoghezi : ";
                     cin >> prenume;
-                    cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le interoghezi : ";
+                    cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le interoghezi (M/F): ";
                     cin >> gender;
-                    b.query(nume_de_familie + " " + prenume, gender) ;
-                }
-                else if ( (cod1 == "an" && cod2 == "gen") || (cod2 == "an" && cod1 == "gen")) {
+                    b.query(nume_de_familie + " " + prenume, gender);
+                    AfisareInformatii();
+                } else if ((cod1 == "an" && cod2 == "gen") || (cod2 == "an" && cod1 == "gen")) {
                     cout << "Introduceti anul de nastere persoanei/persoanelor pe care vrei sa le interoghezi : ";
-                    cin >> an;
-                    cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le interoghezi : ";
-                    cin >> gender;
-                    b.query(an, gender) ;
+                    cin >> an_string;
+                    bool ok = true;
+                    for (int i = 0; i < an_string.size(); ++i)
+                        if (an_string[i] < '0' || an_string[i] > '9')
+                            ok = false;
+                    if (ok == true) {
+                        an = atoi(an_string);
+                        cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le interoghezi (M/F) : ";
+                        cin >> gender;
+                        b.query(an, gender);
+                        AfisareInformatii();
+                    } else {
+                        cout << "---------Cod invalid. Reia operatia------------ ";
+                        AfisareInformatii();
+                    }
                 }
-                else
-                    cout << "---------Cod invalid. Reia operatia------------ ";
             }
             else if (numar == 3) {
                 cout << "Introduceti numele de familie al persoanei/persoanelor pe care vrei sa le interoghezi  : ";
@@ -618,156 +597,42 @@ int main()
                 cout << "Introduceti prenumele persoanei/persoanelor pe care vrei sa le interoghezi : ";
                 cin >> prenume;
                 cout << "Introduceti anul de nastere persoanei/persoanelor pe care vrei sa le interoghezi : ";
-                cin >> an;
-                cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le interoghezi : ";
-                cin >> gender;
-                b.query(nume_de_familie + " " + prenume, an, gender) ;
+                cin >> an_string;
+                bool ok = true;
+                for (int i = 0; i < an_string.size(); ++i)
+                    if (an_string[i] < '0' || an_string[i] > '9')
+                        ok = false;
+                if ( ok == true ) {
+                    an = atoi(an_string);
+                    cout << "Introduceti genul persoanei/persoanelor pe care vrei sa le interoghezi (M/F): ";
+                    cin >> gender;
+                    b.query(nume_de_familie + " " + prenume, an, gender);
+                    AfisareInformatii();
+                }
+                else {
+                    cout << "---------Cod invalid. Reia operatia------------ ";
+                    AfisareInformatii();
+                }
             }
-            else
-                cout << "---------Numar invalid de atribute. Reia operatia---------" ;
+            else {
+                cout << "---------Numar invalid de atribute. Reia operatia---------";
+                AfisareInformatii();
+            }
 
         }
-        else
+        else {
             cout << "---------Cod invalid. Reia operatia------------ ";
-    }
-     */
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "Baza de date");
-    sf::Font font;
-    if( !font.loadFromFile("/Users/georgeboboc/Desktop/Proiecte/HelloSFML/arial.ttf") ) {
-        cout << "ERROR" ;
-    }
-    sf::Text text1 ,text2 , text3 , text4 ,text5;
-    text1.setFont(font);
-    text1.setString("---------------Program gestiune baze de date-----------------");
-    text1.setCharacterSize(48);
-    text1.setFillColor(sf::Color::White);
-    text1.setStyle(sf::Text::Bold);
-
-    TextBox textbox1(24, sf::Color::White, true);
-    textbox1.setFont(font) ;
-    textbox1.setPosition({850,100});
-
-    TextBox textbox2(24, sf::Color::White, true);
-    textbox2.setFont(font) ;
-    textbox2.setPosition({750,125});
-
-    TextBox textbox(24, sf::Color::White, true);
-    textbox.setFont(font) ;
-    textbox.setPosition({450,100});
-
-    Button btn1("Adaugare", {200,100}, 32, sf::Color::Green, sf::Color::Black);
-    btn1.setPosition({100,100});
-    btn1.setFont(font);
-
-    Button btn2("Stergere", {200,100}, 32, sf::Color::Green, sf::Color::Black);
-    btn2.setPosition({100,225});
-    btn2.setFont(font);
-
-    Button btn3("Interogare", {200,100}, 32, sf::Color::Green, sf::Color::Black);
-    btn3.setPosition({100,350});
-    btn3.setFont(font);
-
-    Button btn4("Afisare BD", {200,100}, 32, sf::Color::Green, sf::Color::Black);
-    btn4.setPosition({100,475});
-    btn4.setFont(font);
-
-    static bool lock_click ;
-    persoana p;
-    baza_de_date b;
-    string nume_de_familie, prenume;
-    int an;
-    char gender;
-    p.set_nume("Gigel Frone");
-    p.set_an_nastere(2000);
-    p.set_gen('M');
-    b.adauga(p);
-    while (window.isOpen())
-    {
-        sf::Event event;
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-            textbox1.setSelected(true);
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-            textbox1.setSelected(false);
-        while (window.pollEvent(event))
-        {
-            switch (event.type) {
-                case sf::Event::Closed:
-                    window.close();
-                case sf::Event::TextEntered:
-                    textbox1.typedOn(event);
-                    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
-                        cout << textbox1.getText() ;
-                case sf::Event::MouseMoved:
-                    if(btn1.isMouseOver(window))
-                        btn1.setBackColor(sf::Color::White);
-                    else if (!btn1.isMouseOver(window))
-                        btn1.setBackColor(sf::Color::Green);
-                    if(btn2.isMouseOver(window))
-                        btn2.setBackColor(sf::Color::White);
-                    else if (!btn2.isMouseOver(window))
-                        btn2.setBackColor(sf::Color::Green);
-                    if(btn3.isMouseOver(window))
-                        btn3.setBackColor(sf::Color::White);
-                    else if (!btn3.isMouseOver(window))
-                        btn3.setBackColor(sf::Color::Green);
-                    if(btn4.isMouseOver(window))
-                        btn4.setBackColor(sf::Color::White);
-                    else if (!btn4.isMouseOver(window))
-                        btn4.setBackColor(sf::Color::Green);
-                case sf::Event::MouseButtonPressed:
-                    if (event.mouseButton.button == sf::Mouse::Left && lock_click != true) {
-                        if(btn1.isMouseOver(window)) {
-                            /*
-                            cout << "Introduceti numele de familie al persoanei : " << " ";
-                            cin >> nume_de_familie;
-                            cout << "Introduceti prenumele persoanei : " << " ";
-                            cin >> prenume;
-                            p.set_nume(nume_de_familie + " " + prenume);
-                            cout << "Introduceti anul nasterii persoanei : " << " ";
-                            cin >> an;
-                            p.set_an_nastere(an);
-                            cout << "Introduceti genul persoanei : " << " ";
-                            cin >> gender;
-                            p.set_gen(gender);
-                            b.adauga(p);
-                            cout << "Adaugat cu succes";
-                             */
-                            bool loop = true ;
-                            while ( loop ) {
-                                //cout << "PL";
-                                window.clear();
-                                window.draw(text1);
-                                textbox1.drawTo(window,{850,200});
-                                textbox.printConsole(window, "Introduceti numele de familie al persoanei : " , {350,200});
-                                nume_de_familie = textbox.getText();
-                                textbox.printConsole(window, "Introduceti prenumele persoanei : " , {457,227});
-                                prenume = textbox.getText();
-                                p.set_nume(nume_de_familie + " " + prenume) ;
-                                textbox.printConsole(window, "Introduceti anul nasterii persoanei : " , {437, 254} ) ;
-                                textbox.printConsole(window,"Introduceti genul persoanei (M/F) : ", {447,281}) ;
-                                btn1.drawTo(window);
-                                btn2.drawTo(window);
-                                btn3.drawTo(window);
-                                btn4.drawTo(window);
-                                window.display();
-                            }
-                        }
-                        if(btn4.isMouseOver(window)){
-                            cout << "OK" ;
-                        }
-                        lock_click = true ;
-                    }
-            }
+            AfisareInformatii();
         }
-        window.clear();
-        window.draw(text1);
-        //textbox1.drawTo(window);
-        //textbox1.printConsole(window, "Hello world", {500,300});
-        btn1.drawTo(window);
-        btn2.drawTo(window);
-        btn3.drawTo(window);
-        btn4.drawTo(window);
-        window.display();
-    }
+    }*/
+    persoana p;
+    p.set_nume("Boboc George");
+    p.set_an_nastere(2003);
+    p.set_gen('M');
+    /*
+    baza_de_date b = p;
+    persoana q;
+    q = b;
+    cout << q.get_nume();*/
+
 }

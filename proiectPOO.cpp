@@ -78,8 +78,20 @@ public :
     void query(int, char);
     void query(string, int, char);
     friend ostream& operator << (ostream&, baza_de_date&) ;
+    operator persoana();
+    void operator= (persoana);
 
 };
+
+void baza_de_date ::operator= (persoana p) {
+    this->v.push_back(p);
+    nr_persoane ++ ;
+}
+
+baza_de_date::operator persoana() {
+    if ( nr_persoane > 0 )
+        return v[0]; //implicit prima persoana
+}
 
 void baza_de_date::adauga(persoana p) {
     this->v.push_back(p);
@@ -288,7 +300,6 @@ void AfisareInformatii(){
 }
 
 int main() {
-    /*
     cout << "-----------Program gestiune baze de date-----------------" << endl;
     cout << endl << "Operatii posibile : " << endl << "1. Adaugarea unui om in baza de date - prin codul de comanda -- add"
          << endl;
@@ -624,15 +635,25 @@ int main() {
             cout << "---------Cod invalid. Reia operatia------------ ";
             AfisareInformatii();
         }
-    }*/
+    }/*
     persoana p;
     p.set_nume("Boboc George");
     p.set_an_nastere(2003);
     p.set_gen('M');
+
     /*
-    baza_de_date b = p;
-    persoana q;
-    q = b;
-    cout << q.get_nume();*/
+    Partea intai // overload pe operator de atribuire
+    baza_de_date b;
+    b = p;
+    cout << b;
+     */
+
+    /*Partea a doua // operator de cast
+    baza_de_date b;
+    b.adauga(p);
+    persoana q = b;
+    cout << q.get_nume() << " " << q.get_an_nastere() << " "  << q.get_gen();//OKAY
+     */
+
 
 }

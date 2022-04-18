@@ -1,8 +1,25 @@
 #include <iostream>
 #include <vector>
+#include <exception>
 
 using namespace std ;
 int no_contracte ;
+
+int notValid(string s) {
+    for (int i = 0 ; i < s.size(); ++i)
+        if (!isdigit(s[i]))
+            return true ;
+    return false ;
+}
+
+int atoi(string s) {
+        int numar = 0 , p = 1 ;
+        for (int i = s.size() - 1 ; i >= 0 ; --i ){
+            numar += p * ( s[i] - '0' );
+            p *= 10;
+        }
+        return numar ;
+}
 
 class Contract {
     string numar_contract ;
@@ -88,16 +105,46 @@ int Contract::get_valoare() {
 }
 
 void Contract::citire(istream& in){
-    cout << "Introduceti numarul de contract : " ;
-    in >> this->numar_contract ;
-    cout << "Introduceti anul in care a fost realizat contractul : " ;
-    in >> this->an ;
+    cout << "Introduceti numarul de contract : ";
+    in >> this->numar_contract;
+    bool loop = false ;
+    while ( !loop ) {
+        try {
+            string input;
+            cout << "Introduceti anul in care a fost realizat contractul : ";
+            in >> input;
+            if (notValid(input))
+                throw 503;
+            else {
+                this->an = atoi(input);
+                loop = true;
+            }
+        }
+        catch (int c) {
+            cout << endl << "Erorr " << c << "(expected integer). Try again." << endl;
+        }
+    }
     cout << "Introduceti numele beneficiarului : " ;
     in >> this->beneficiar ;
     cout << "Introduceti numele furnizorului : " ;
     in >> this->furnizor ;
-    cout << "Introduceti valoarea contractului ( lei ) : " ;
-    in >> this->valoare ;
+    loop = false ;
+    while ( !loop ) {
+        try {
+            string input;
+            cout << "Introduceti valoarea contractului (lei) : ";
+            in >> input;
+            if (notValid(input))
+                throw 503;
+            else {
+                this->valoare = atoi(input);
+                loop = true;
+            }
+        }
+        catch (int c) {
+            cout << endl << "Erorr " << c << "(expected integer). Try again." << endl;
+        }
+    }
 }
 
 istream& operator >> (istream& in, Contract& c) {
@@ -142,8 +189,24 @@ void ContractInchiriere::set_perioada(int per) {
 
 void ContractInchiriere::citire(istream& in) {
     Contract::citire(in) ;
-    cout << "Introduceti perioada ( luni ) de valabilitate a contractului : " ;
-    in >> this->perioada ;
+    bool loop = false ;
+    while ( !loop ) {
+        try {
+            string input;
+            //cout << "Introduceti anul in care a fost realizat contractul : ";
+            cout << "Introduceti perioada ( luni ) de valabilitate a contractului : " ;
+            in >> input;
+            if (notValid(input))
+                throw 503;
+            else {
+                this->perioada = atoi(input);
+                loop = true;
+            }
+        }
+        catch (int c) {
+            cout << endl << "Erorr " << c << "(expected integer). Try again." << endl;
+        }
+    }
 }
 
 istream& operator >> (istream& in, ContractInchiriere& c) {
@@ -154,6 +217,7 @@ istream& operator >> (istream& in, ContractInchiriere& c) {
 void ContractInchiriere::afisare(ostream& out) {
     Contract::afisare(out) ;
     cout <<  "Cu valoarea totala de : -- " << this->perioada * this->get_valoare() << " unitati monetare" << endl ;
+    cout << endl ;
 }
 
 ostream& operator << (ostream& out, ContractInchiriere& c) {
@@ -177,8 +241,54 @@ public :
     friend istream& operator >> (istream&, Dosar&) ;
     friend ostream& operator << (ostream&, Dosar&) ;
     void Citire() ;
+    void SearchByNumber(string);
+    void SearchByYear(int);
+    void printBeneficiari();
+    void printFurnizori();
 
 };
+
+void Dosar::SearchByNumber(string number) {
+    bool found = 0 ;
+    for ( int i = 1 ; i <= this->get_nrContracte() - 1 ; ++i ) {
+        ContractInchiriere c = this->Contracte[i] ;
+        if ( c.get_numar_contract() == number ) {
+            cout << c;
+            found = 1;
+        }
+    }
+    if ( found == 0 )
+        cout << "------------Nu exista--------------" << endl ;
+}
+
+void Dosar::SearchByYear(int an) {
+    bool found = 0 ;
+    for ( int i = 1 ; i <= this->get_nrContracte() - 1 ; ++i ) {
+        ContractInchiriere c = this->Contracte[i] ;
+        if ( c.get_an() == an ) {
+            cout << c;
+            found = 1;
+        }
+    }
+    if ( found == 0 )
+        cout << "------------Nu exista--------------" << endl ;
+}
+
+void Dosar::printBeneficiari() {
+    cout << "------Lista de beneficiari-----------" << endl ;
+    for ( int i = 1 ; i <= this->get_nrContracte() - 1 ; ++i ) {
+        ContractInchiriere c = this->Contracte[i] ;
+        cout << i << "- " << c.get_beneficiar() << endl ;
+    }
+}
+
+void Dosar::printFurnizori() {
+    cout << "------Lista de furnizori-----------" << endl ;
+    for ( int i = 1 ; i <= this->get_nrContracte() - 1 ; ++i ) {
+        ContractInchiriere c = this->Contracte[i] ;
+        cout << i << "- " << c.get_furnizor() << endl ;
+    }
+}
 
 int Dosar::nr_contracte = 1 ;
 
@@ -206,16 +316,22 @@ istream& operator >> (istream& in, Dosar& d) {
 }
 
 ostream& operator << (ostream& out, Dosar& d) {
-    for (int i = 1 ; i <= d.get_nrContracte() - 1; ++i ) {
-        ContractInchiriere c ;
-        c = d.Contracte[i] ;
-        cout << c  ;
-    }
+        for (int i = 1; i <= d.get_nrContracte() - 1; ++i) {
+            /* fara UPCAST
+            ContractInchiriere c ;
+            c = d.Contracte[i] ;
+            cout << c ;
+             */
+            // cu UPCAST
+            Contract *p;
+            p = &d.Contracte[i];
+            cout << *p;
+        }
+        cout << endl ;
 }
 
 
 int main() {
-    ContractInchiriere c1("a",0,"a","a",0,1) ;
     //cout << c1 ;
     //c2 = c1 ;
     //cout << c2 ;
@@ -223,5 +339,52 @@ int main() {
     //cout << Dosar1.get_nrContracte();
     Dosar d ;
     cin >> d ;
-    cout << d ;
+    int operatie = 0 ;
+    while ( operatie != 6 ) {
+        cout << "---------------Alegeti operatia :" << endl;
+        cout << "1 - Afisarea tuturor contractelor din dosarul curent" << endl;
+        cout << "2 - Afisarea unui contract cu numar precizat din dosarul curent" << endl;
+        cout << "3 - Afisarea unui contract cu anul precizat din dosarul curent" << endl;
+        cout << "4 - Afisarea tuturor beneficiarilor din dosarul curent" << endl;
+        cout << "5 - Afisarea tuturor furnizorilor din dosarul curent" << endl;
+        cout << "6 - Exit" << endl;
+        cout << "Introduceti operatia : ";
+        cin >> operatie;
+        cout << endl;
+        if ( operatie == 1 ) cout << d ;
+        else if ( operatie == 2 ) {
+            string number ;
+            cout << "Introduceti numarul de contract: " ;
+            cin >> number ;
+            d.SearchByNumber(number) ;
+
+        }
+        else if ( operatie == 3 ) {
+            int an ;
+            bool loop = false ;
+            while ( !loop ) {
+                try {
+                    string input;
+                    //cout << "Introduceti anul in care a fost realizat contractul : ";
+                    cout << "Introduceti anul in care a fost inceput contractul: " ;
+                    cin >> input;
+                    if (notValid(input))
+                        throw 503;
+                    else {
+                        d.SearchByYear(an) ;;
+                        loop = true;
+                    }
+                }
+                catch (int c) {
+                    cout << endl << "Erorr " << c << "(expected integer). Try again." << endl;
+                }
+            }
+        }
+        else if ( operatie == 4 ) d.printBeneficiari() ;
+        else if ( operatie == 5 ) d.printFurnizori() ;
+        else if ( operatie == 6 ) exit(0) ;
+        else
+            cout << "-----------Operatie invalida. Incearca din nou--------------" << endl ;
+
+    }
 }

@@ -300,6 +300,16 @@ void Dosar::set_nrContracte(int number) {
     nr_contracte = number ;
 }
 
+void vector_n_contracte(int nr_elemente) {
+    Contract **vector = static_cast <Contract**> (malloc(sizeof(Contract *) * nr_elemente));
+    for ( int i = 0 ; i < nr_elemente ; i++ ){
+        vector[i] = new ContractInchiriere("NULL" , 0 , "NULL", "NULL" , 0 , 0);
+        ContractInchiriere *pInchiriere = dynamic_cast <ContractInchiriere*> (vector[i]);
+        cin >> *pInchiriere ;
+        cout << *pInchiriere << '\n';
+    }
+}
+
 ContractInchiriere c[100];
 istream& operator >> (istream& in, Dosar& d) {
     cout << "Introduceti numarul de contracte de inchiere : " ;
@@ -342,6 +352,7 @@ int main() {
     Dosar d ;
     cin >> d ;
     int operatie = 0 ;
+    //vector_n_contracte(3);
     while ( operatie != 6 ) {
         cout << "---------------Alegeti operatia :" << endl;
         cout << "1 - Afisarea tuturor contractelor din dosarul curent" << endl;

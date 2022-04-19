@@ -13,12 +13,12 @@ int notValid(string s) {
 }
 
 int atoi(string s) {
-        int numar = 0 , p = 1 ;
-        for (int i = s.size() - 1 ; i >= 0 ; --i ){
-            numar += p * ( s[i] - '0' );
-            p *= 10;
-        }
-        return numar ;
+    int numar = 0 , p = 1 ;
+    for (int i = s.size() - 1 ; i >= 0 ; --i ){
+        numar += p * ( s[i] - '0' );
+        p *= 10;
+    }
+    return numar ;
 }
 
 class Contract {
@@ -169,7 +169,7 @@ class ContractInchiriere : public Contract {
     int perioada ;
 public :
     ContractInchiriere(string nr = "NULL" , int a = 0 , string b = "NULL" , string f = "NULL" , int v = 0 , int per = 0) : Contract(nr,a,b,f,v) {
-       perioada = per ;
+        perioada = per ;
     }
     int get_perioada() ;
     void set_perioada(int) ;
@@ -226,15 +226,15 @@ ostream& operator << (ostream& out, ContractInchiriere& c) {
 }
 
 class Dosar {
-    ContractInchiriere *Contracte ;
+    ContractInchiriere *Contracte[100] ;
     static int nr_contracte ;
 public :
     Dosar() {
-        Contracte = new ContractInchiriere[100] ;
-        nr_contracte = 1 ;
+        *Contracte = new ContractInchiriere[100] ;
+        nr_contracte = 1 ; // nu ca ar functiona
     }
     ~Dosar() {
-        delete []Contracte ;
+        delete []*Contracte ;
     }
     static int get_nrContracte() ;
     static void set_nrContracte(int number);
@@ -251,9 +251,9 @@ public :
 void Dosar::SearchByNumber(string number) {
     bool found = 0 ;
     for ( int i = 1 ; i <= this->get_nrContracte() - 1 ; ++i ) {
-        ContractInchiriere c = this->Contracte[i] ;
-        if ( c.get_numar_contract() == number ) {
-            cout << c;
+        ContractInchiriere *c = this->Contracte[i] ;
+        if ( (*c).get_numar_contract() == number ) {
+            cout << *c;
             found = 1;
         }
     }
@@ -264,9 +264,9 @@ void Dosar::SearchByNumber(string number) {
 void Dosar::SearchByYear(int an) {
     bool found = 0 ;
     for ( int i = 1 ; i <= this->get_nrContracte() - 1 ; ++i ) {
-        ContractInchiriere c = this->Contracte[i] ;
-        if ( c.get_an() == an ) {
-            cout << c;
+        ContractInchiriere *c = this->Contracte[i] ;
+        if ( (*c).get_an() == an ) {
+            cout << *c;
             found = 1;
         }
     }
@@ -277,16 +277,16 @@ void Dosar::SearchByYear(int an) {
 void Dosar::printBeneficiari() {
     cout << "------Lista de beneficiari-----------" << endl ;
     for ( int i = 1 ; i <= this->get_nrContracte() - 1 ; ++i ) {
-        ContractInchiriere c = this->Contracte[i] ;
-        cout << i << "- " << c.get_beneficiar() << endl ;
+        ContractInchiriere *c = this->Contracte[i] ;
+        cout << i << "- " << (*c).get_beneficiar() << endl ;
     }
 }
 
 void Dosar::printFurnizori() {
     cout << "------Lista de furnizori-----------" << endl ;
     for ( int i = 1 ; i <= this->get_nrContracte() - 1 ; ++i ) {
-        ContractInchiriere c = this->Contracte[i] ;
-        cout << i << "- " << c.get_furnizor() << endl ;
+        ContractInchiriere *c = this->Contracte[i] ;
+        cout << i << "- " << (*c).get_furnizor() << endl ;
     }
 }
 
@@ -300,35 +300,37 @@ void Dosar::set_nrContracte(int number) {
     nr_contracte = number ;
 }
 
+ContractInchiriere c[100];
 istream& operator >> (istream& in, Dosar& d) {
     cout << "Introduceti numarul de contracte de inchiere : " ;
     in >> no_contracte ;
     cout << endl ;
     for (int i = 1 ; i <= no_contracte ; ++i ) {
-        ContractInchiriere c;
         cout << "Introduceti contractul de inchiriere cu numarul " << d.get_nrContracte() << endl;
-        in >> c ;
+        in >> c[i] ;
         cout << endl ;
-        d.Contracte[d.get_nrContracte()] = c ;
+        d.Contracte[d.get_nrContracte()] = &c[i] ;
         d.set_nrContracte(d.get_nrContracte() + 1) ;
     }
     return in ;
 }
 
 ostream& operator << (ostream& out, Dosar& d) {
-        for (int i = 1; i <= d.get_nrContracte() - 1; ++i) {
-            /* fara UPCAST
-            ContractInchiriere c ;
-            c = d.Contracte[i] ;
-            cout << c ;
-             */
-            // cu UPCAST
-            Contract *p;
-            p = &d.Contracte[i];
-            cout << *p;
-        }
-        cout << endl ;
+    for (int i = 1; i <= d.get_nrContracte() - 1; ++i) {
+        //ContractInchiriere *c ;
+        //c = d.Contracte[i] ;
+        //out << *c ;
+
+        //Sper ca UPCAST
+        Contract *p ; // asta e TOP-ul ierarhiei
+        p = d.Contracte[i] ; //ii atribui un pointer catre un obiect din clasa derivata
+        cout << *p ;
+
+    }
+    out << endl ;
+    return out ;
 }
+
 
 
 int main() {
@@ -371,7 +373,7 @@ int main() {
                     if (notValid(input))
                         throw 503;
                     else {
-                        d.SearchByYear(an) ;;
+                        d.SearchByYear(atoi(input)) ;;
                         loop = true;
                     }
                 }

@@ -403,6 +403,11 @@ int main() {
 }
 
 
+
+
+
+
+
 #include <iostream>
 #include <vector>
 
@@ -839,8 +844,15 @@ int main() {
             running = false ;
     }
     
+}
+
+
+
+
+
     
-    #include <iostream>
+    
+#include <iostream>
 #include <vector>
 
 using namespace std ;
@@ -1255,5 +1267,551 @@ int main() {
     }
 
 }
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
+#include <iostream>
+#include <vector>
+
+using namespace std ;
+
+class Masca {
+protected :
+    string tipMasca;
+public :
+    Masca( string tipMasca = "" ) {
+        this -> tipMasca = tipMasca ;
+    }
+    virtual ~Masca() {
+        tipMasca = "" ;
+    }
+    virtual void citire(istream&) ;
+    friend istream& operator>> (istream&, Masca &) ;
+    virtual void afisare(ostream&) ;
+    friend ostream& operator<< (ostream&, Masca &) ;
+    string getTip() ;
+
+};
+
+string Masca::getTip() {
+    return tipMasca ;
+}
+
+void Masca::citire(istream &in) {
+    cout << "Introduceti tipul mastii: " ;
+    in >> this -> tipMasca ;
+}
+
+istream& operator>> (istream& in, Masca& m) {
+    m.citire(in) ;
+    return in ;
+}
+
+void Masca::afisare(ostream &out) {
+    out << "Tipul mastii: " << this -> tipMasca << endl ;
+}
+
+ostream& operator<< (ostream& out, Masca& m) {
+    m.afisare(out) ;
+    return out ;
+}
+
+
+class MascaChirurgicala : public Masca {
+    string culoare ;
+    int nrPliuri ;
+public :
+    MascaChirurgicala(string tipMasca = "" , string culoare = "" , int nrPliuri = 0) : Masca(tipMasca) {
+        this -> culoare = culoare ;
+        this -> nrPliuri = nrPliuri ;
+    }
+    ~MascaChirurgicala() {
+        culoare = "" ;
+    }
+    void citire(istream&) ;
+    friend istream& operator>> (istream&, MascaChirurgicala &) ;
+    void afisare(ostream&) ;
+    friend ostream& operator<< (ostream&, MascaChirurgicala &) ;
+};
+
+void MascaChirurgicala::citire(istream &in) {
+    Masca::citire(in) ;
+    cout << "Introduceti culoarea mastii: " ;
+    in >> this -> culoare ;
+    cout << "Introduceti numarul de pliuri: " ;
+    in >> this -> nrPliuri ;
+}
+
+istream& operator>> (istream& in, MascaChirurgicala& m) {
+    m.citire(in) ;
+    return in ;
+}
+
+void MascaChirurgicala::afisare(ostream &out) {
+    Masca::afisare(out) ;
+    out << "Introduceti culoarea mastii: " << this -> culoare << endl ;
+    out << "Introduceti numarul de pliuri: " << this -> nrPliuri << endl ;
+}
+
+ostream& operator<< (ostream& out, MascaChirurgicala& m) {
+    m.afisare(out) ;
+    return out ;
+}
+
+class MascaPolicarbonat : public Masca {
+    string tipPrindere ;
+public :
+    MascaPolicarbonat( string tipMasca = "" , string tipPrindere = "" ) : Masca(tipMasca) {
+        this -> tipPrindere = tipPrindere ;
+    }
+    ~MascaPolicarbonat() {
+        tipPrindere = "" ;
+    }
+    void citire(istream&) ;
+    friend istream& operator>> (istream&, MascaPolicarbonat &) ;
+    void afisare(ostream&) ;
+    friend ostream& operator<< (ostream&, MascaPolicarbonat &) ;
+};
+
+void MascaPolicarbonat::citire(istream &in) {
+    Masca::citire(in) ;
+    cout << "Introduceti tipul de prindere: " ;
+    in >> this -> tipPrindere ;
+}
+
+istream& operator>> (istream& in, MascaPolicarbonat& m) {
+    m.citire(in) ;
+    return in ;
+}
+
+void MascaPolicarbonat::afisare(ostream &out) {
+    Masca::afisare(out) ;
+    out << "Introduceti tipul de prindere: " << this -> tipPrindere ;
+}
+
+ostream& operator<< (ostream& out, MascaPolicarbonat& m) {
+    m.afisare(out) ;
+    return out ;
+}
+
+
+class Dezinfectant {
+protected:
+    int nrOrganisme;
+    int nrIngrediente ;
+    int nrSuprafete ;
+    vector<string> ingrediente;
+    vector<string> suprafete;
+    float eficienta ;
+public:
+    Dezinfectant(int nrOrganisme = 0, int nrIngrediente = 0, int nrSuprafete = 0, vector<string> ingrediente = {}, vector<string> suprafete = {}) {
+        this -> nrOrganisme = nrOrganisme ;
+        this -> nrIngrediente = nrIngrediente ;
+        this -> nrSuprafete = nrSuprafete ;
+        for ( int i = 0 ; i < ingrediente.size() ; ++i )
+            this -> ingrediente[i] = ingrediente[i] ;
+        for ( int i = 0 ; i < suprafete.size() ; ++i )
+            this -> suprafete[i] = suprafete[i] ;
+    }
+    virtual ~Dezinfectant() {
+       ingrediente.clear() ;
+       suprafete.clear() ;
+    }
+    void citire(istream&) ;
+    friend istream& operator>> (istream& in, Dezinfectant &d) ;
+    void afisare(ostream&) ;
+    friend ostream& operator<< (ostream& out, Dezinfectant &d) ;
+    virtual float get_eficienta() ;
+};
+
+float Dezinfectant::get_eficienta() {
+    return this -> eficienta ;
+}
+
+void Dezinfectant::citire(istream &in) {
+    cout << "Introduceti numarul de Organisme pe care il poate ucide dezinfectantul: " ;
+    in >> this -> nrOrganisme ;
+    cout << "Introduceti numarul de ingrediente al dezinfectantului: " ;
+    in >> this -> nrIngrediente ;
+    cout << "Introduceti ingredientele dezinfectantului: " << endl;
+    for ( int i = 0 ; i < nrIngrediente ; ++i ) {
+        cout << i + 1 << ": ";
+        string s ;
+        in >> s ;
+        this->ingrediente.push_back(s) ;
+    }
+    cout << "Introduceti numarul de suprafete pe care poate fi folosit dezinfectantul: " ;
+    in >> this -> nrSuprafete ;
+    cout << "Introduceti suprafetele pe care puteti folosi dezinfectantul: " << endl ;
+    for ( int i = 0 ; i < nrSuprafete ; ++i ) {
+        cout << i + 1 << ": ";
+        string s ;
+        in >> s ;
+        this->suprafete.push_back(s) ;
+    }
+
+}
+
+istream& operator>> (istream& in, Dezinfectant &d) {
+    d.citire(in) ;
+    return in ;
+}
+
+void Dezinfectant::afisare(ostream &out) {
+    out << "Numarul de Organisme pe care il poate ucide dezinfectantul: " << this -> nrOrganisme << endl ;
+    out << "Ingredientele dezinfectantului: " << endl ;
+    for ( int i = 0 ; i < nrIngrediente ; ++i )
+        out << i + 1 << ": " << this -> ingrediente[i] << endl ;
+    out << "Suprafetele pe care puteti folosi dezinfectantul: " << endl ;
+    for ( int i = 0 ; i < nrSuprafete ; ++i )
+        out << i + 1 << ": " << this->suprafete[i] << endl ;
+    out << "Eficienta dezinfectant: " << this -> get_eficienta() << endl  ;
+
+}
+
+ostream& operator<< (ostream& out, Dezinfectant &d) {
+    d.afisare(out) ;
+    return out;
+}
+
+class DezinfectantBacterii : public Dezinfectant {
+public :
+    DezinfectantBacterii( int nrOrgansime = 0, int nrIngrediente = 0, int nrSuprafete = 0, vector<string> ingrediente = {}, vector<string> suprafete = {} )
+    : Dezinfectant( nrOrgansime, nrIngrediente , nrSuprafete, ingrediente, suprafete) {} ;
+    float get_eficienta() ;
+};
+
+float DezinfectantBacterii::get_eficienta() {
+    return this -> nrOrganisme / 1000000000 * 100 ;
+}
+
+class DezinfectantFungi : public Dezinfectant {
+public :
+    DezinfectantFungi( int nrOrgansime = 0, int nrIngrediente = 0, int nrSuprafete = 0, vector<string> ingrediente = {}, vector<string> suprafete = {} )
+    : Dezinfectant( nrOrgansime, nrIngrediente , nrSuprafete, ingrediente, suprafete) {} ;
+    float get_eficienta() ;
+};
+
+float DezinfectantFungi::get_eficienta() {
+    return this -> nrOrganisme / 1500000 * 100;
+}
+
+
+class DezinfectantVirusi : public Dezinfectant {
+public :
+    DezinfectantVirusi( int nrOrgansime = 0, int nrIngrediente = 0, int nrSuprafete = 0, vector<string> ingrediente = {}, vector<string> suprafete = {} )
+    : Dezinfectant( nrOrgansime, nrIngrediente , nrSuprafete, ingrediente, suprafete) {} ;
+    float get_eficienta() ;
+};
+
+float DezinfectantVirusi::get_eficienta() {
+    return this -> nrOrganisme / 100000000 * 100;
+}
+
+class Achizitie {
+    int zi, luna, an ;
+    string numeClient ;
+    int nrDezinfectanti ;
+    vector <Dezinfectant*> Dezinfectanti ;
+    int nrMasti ;
+    vector <Masca*> Masti ;
+    double pret ;
+public :
+    Achizitie ( int zi = 0 , int luna = 0 , int an = 0 , string numeClient = "", vector <Dezinfectant*> Dezinfectanti= {}, vector <Masca*> Masti = {}) {
+        this -> zi = zi ;
+        this -> luna = luna ;
+        this -> an = an ;
+        this -> numeClient = numeClient ;
+        for (int i = 0 ; i < Dezinfectanti.size() ; ++i )
+            this -> Dezinfectanti[i] = Dezinfectanti[i] ;
+        for ( int i = 0 ; i < Masti.size() ; ++i )
+            this -> Masti[i] = Masti[i] ;
+    }
+    ~Achizitie() {
+        numeClient = "" ;
+        Dezinfectanti.clear() ;
+        Masti.clear() ;
+    }
+    void citire(istream&) ;
+    friend istream& operator>> (istream& in , Achizitie& a) ;
+    void set_pret() ;
+    double get_pret() ;
+    int get_luna() ;
+};
+
+int Achizitie::get_luna() {
+    return this -> luna ;
+}
+
+
+void Achizitie::citire(istream &in) {
+    cout << "Introduceti ziua achiziei: " ;
+    in >> this -> zi ;
+    cout << "Introduceti luna achiziei: " ;
+    in >> this -> luna ;
+    cout << "Introduceti anul achiziei: " ;
+    in >> this -> an ;
+    cout << "Introduceti numarul de dezinfectanti ai achizitiei: " ;
+    in >> this -> nrDezinfectanti ;
+    for ( int i = 0 ; i < nrDezinfectanti ; ++i ) {
+        cout << "1 - Pentru bacterii " << endl;
+        cout << "2 - Pentru fungi" << endl;
+        cout << "3 - Pentru virusuri" << endl;
+        cout << "Tipul dezinfectatului cu numarul " << i + 1 << " : " ;
+        int tip;
+        in >> tip;
+        if (tip == 1) {
+            DezinfectantBacterii *d = new DezinfectantBacterii;
+            in >> *d;
+            Dezinfectanti.push_back(d);
+        }
+        if (tip == 2) {
+            DezinfectantFungi *d = new DezinfectantFungi;
+            in >> *d;
+            Dezinfectanti.push_back(d);
+        }
+        if (tip == 3) {
+            DezinfectantVirusi *d = new DezinfectantVirusi;
+            in >> *d;
+            Dezinfectanti.push_back(d);
+        }
+    }
+    cout << "Introduceti numarul de masti al achizitiei: " ;
+    in >> this -> nrMasti ;
+    for ( int i = 0 ; i < nrMasti ; ++i ) {
+        cout << "1 - Masca chirurgicala " << endl;
+        cout << "2 - Masca policarbonata" << endl;
+        cout << "Tipul mastii cu numarul " << i + 1 << " : " ;
+        int tip;
+        in >> tip;
+        if (tip == 1) {
+            MascaChirurgicala *m = new MascaChirurgicala;
+            in >> *m;
+            Masti.push_back(m);
+        }
+        if (tip == 2) {
+            MascaPolicarbonat *m = new MascaPolicarbonat;
+            in >> *m;
+            Masti.push_back(m);
+        }
+    }
+
+}
+
+istream& operator>> (istream& in, Achizitie& a) {
+    a.citire(in) ;
+    return in ;
+}
+
+void Achizitie::set_pret() {
+    float pret = 0 ;
+    for ( int i = 0 ; i < Dezinfectanti.size() ; ++i ) {
+        Dezinfectant *d = Dezinfectanti[i] ;
+        if ( typeid(*d) == typeid (DezinfectantBacterii) ) {
+            DezinfectantBacterii *dez = static_cast <DezinfectantBacterii*> (d) ;
+            float eficienta = dez -> get_eficienta() ;
+            if ( eficienta < 90 )
+                pret = pret + 10 ;
+            else if ( eficienta > 90 && eficienta < 95 )
+                pret = pret + 20 ;
+            else if ( eficienta > 95 && eficienta < 97.5 )
+                pret = pret + 30 ;
+            else if ( eficienta > 97.5 && eficienta < 99 )
+                pret = pret + 40 ;
+            else
+                pret = pret + 50 ;
+        }
+        if ( typeid(*d) == typeid (DezinfectantFungi) ) {
+            DezinfectantFungi *dez = static_cast <DezinfectantFungi*> (d) ;
+            float eficienta = dez -> get_eficienta() ;
+            if ( eficienta > 90 )
+                pret = pret + 10 ;
+            else if ( eficienta > 90 && eficienta < 95 )
+                pret = pret + 20 ;
+            else if ( eficienta > 95 && eficienta < 97.5 )
+                pret = pret + 30 ;
+            else if ( eficienta > 97.5 && eficienta < 99 )
+                pret = pret + 40 ;
+            else
+                pret = pret + 50 ;
+        }
+        if ( typeid(*d) == typeid (DezinfectantVirusi) ) {
+            DezinfectantVirusi *dez = static_cast <DezinfectantVirusi*> (d) ;
+            float eficienta = dez -> get_eficienta() ;
+            if ( eficienta > 90 )
+                pret = pret + 10 ;
+            else if ( eficienta > 90 && eficienta < 95 )
+                pret = pret + 20 ;
+            else if ( eficienta > 95 && eficienta < 97.5 )
+                pret = pret + 30 ;
+            else if ( eficienta > 97.5 && eficienta < 99 )
+                pret = pret + 40 ;
+            else
+                pret = pret + 50 ;
+        }
+    }
+    for ( int i = 0 ; i < Masti.size() ; ++i ) {
+        Masca *m = Masti[i] ;
+        if ( typeid(*m) == typeid(MascaPolicarbonat) )
+            pret = pret + 20 ;
+        else if ( typeid(*m) == typeid(MascaChirurgicala) ) {
+            Masca *masca = static_cast <MascaChirurgicala*> (m) ;
+            if ( m -> getTip() == "FFP1" )
+                pret = pret + 5 ;
+            else if ( m -> getTip() == "FFP2" )
+                pret = pret + 10 ;
+            else if ( m -> getTip() == "FFP3" )
+                pret = pret + 15 ;
+        }
+    }
+    this -> pret = pret ;
+}
+
+double Achizitie::get_pret() {
+    return this -> pret ;
+}
+
+
+class Magazin {
+    vector <Achizitie* > achizitii ;
+    vector <Masca* > masti ;
+    vector <Dezinfectant*> dezinfectanti ;
+public :
+    void adaugaDezinfectant() ;
+    void adaugaMasca() ;
+    void adaugaAchizitie() ;
+    void cautaCelMaiBunDezinfectant() ;
+    void calculeazaVenitLunar() ;
+};
+
+void Magazin::adaugaDezinfectant() {
+    int tip ;
+    cout << "1 - Pentru bacterii " << endl;
+    cout << "2 - Pentru fungi" << endl;
+    cout << "3 - Pentru virusuri" << endl;
+    cout << "Introduceti tipul de dezinfectant pe care vreti sa il adaugati: " ;
+    cin >> tip ;
+    if ( tip == 1 ) {
+        DezinfectantBacterii *d = new DezinfectantBacterii ;
+        cin >> *d ;
+        this -> dezinfectanti.push_back(d) ;
+    }
+    if ( tip == 2 ) {
+        DezinfectantFungi *d = new DezinfectantFungi ;
+        cin >> *d ;
+        this -> dezinfectanti.push_back(d) ;
+    }
+    if ( tip == 3 ) {
+        DezinfectantVirusi *d = new DezinfectantVirusi ;
+        cin >> *d ;
+        this -> dezinfectanti.push_back(d) ;
+    }
+
+}
+
+void Magazin::adaugaMasca() {
+    int tip ;
+    cout << "1 - Masca chirurgicala " << endl;
+    cout << "2 - Masca policarbonata" << endl;
+    cout << "Introduceti tipul mastii: " ;
+    cin >> tip ;
+    if ( tip == 1 ) {
+        MascaChirurgicala *m = new MascaChirurgicala ;
+        cin >> *m ;
+        this -> masti.push_back(m) ;
+    }
+    if ( tip == 1 ) {
+        MascaPolicarbonat *m = new MascaPolicarbonat ;
+        cin >> *m ;
+        this -> masti.push_back(m) ;
+    }
+}
+
+void Magazin::adaugaAchizitie() {
+    Achizitie *a = new Achizitie;
+    cin >> *a ;
+    a -> set_pret() ;
+    this -> achizitii.push_back(a) ;
+}
+
+void Magazin::cautaCelMaiBunDezinfectant() {
+    float vmax = -100 ;
+    Dezinfectant *best ;
+    for ( int i = 0 ; i < dezinfectanti.size() ; ++i ) {
+        Dezinfectant *d = dezinfectanti[i] ;
+        if ( typeid(*d) == typeid(DezinfectantBacterii) ) {
+            DezinfectantBacterii *dez = new DezinfectantBacterii ;
+            dez = static_cast <DezinfectantBacterii*> (d) ;
+            if ( dez -> get_eficienta() > vmax ) {
+                vmax = dez -> get_eficienta() ;
+                best = dez ;
+            }
+        }
+        if ( typeid(*d) == typeid(DezinfectantFungi) ) {
+            DezinfectantFungi *dez = new DezinfectantFungi ;
+            dez = static_cast <DezinfectantFungi*> (d) ;
+            if ( dez -> get_eficienta() > vmax ) {
+                vmax = dez -> get_eficienta() ;
+                best = dez ;
+            }
+        }
+        if ( typeid(*d) == typeid(DezinfectantVirusi) ) {
+            Dezinfectant *dez = new DezinfectantVirusi ;
+            dez = static_cast <DezinfectantVirusi*> (d) ;
+            if ( dez -> get_eficienta() > vmax ) {
+                vmax = dez -> get_eficienta() ;
+                best = dez ;
+            }
+        }
+    }
+    cout << *best ;
+}
+
+void Magazin::calculeazaVenitLunar() {
+    int luna ;
+    cout << "Introduceti luna pentru care doriti sa calculati venitul: " ;
+    cin >> luna ;
+    float pret = 0 ;
+    for ( int i = 0 ; i < achizitii.size() ; ++i ) {
+        Achizitie *a = achizitii[i] ;
+        if ( a -> get_luna() == luna )
+            pret = pret + a -> get_pret() ;
+    }
+    cout << "Pretul pentru luna " << luna << " este " << pret ;  
+}
+
+
+int main() {
+    Magazin m ;
+    while (true) {
+        cout << "1 - Adauga un dezinfectant" << endl ;
+        cout << "2 - Adauga o masca" << endl ;
+        cout << "3 - Adauga o achizitie" << endl ;
+        cout << "4 - Afiseaza cel mai eficient dezinfectant" << endl ;
+        cout << "5 - Calculeaza venitul pentru o anumita luna" << endl ;
+        cout << "6 - Iesire" << endl ;
+        cout << "Introduceti comanda: ";
+        int comanda ;
+        cin >> comanda ;
+        if ( comanda == 1 )
+            m.adaugaDezinfectant() ;
+        else if ( comanda == 2 )
+            m.adaugaMasca() ;
+        else if ( comanda == 3 )
+            m.adaugaAchizitie() ;
+        else if ( comanda == 4 )
+            m.cautaCelMaiBunDezinfectant() ;
+        else if ( comanda == 5 )
+            m.calculeazaVenitLunar() ;
+        if ( comanda == 6 )
+            break ;
+
+    }
 }

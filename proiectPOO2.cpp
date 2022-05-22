@@ -838,4 +838,422 @@ int main() {
         if (optiune == 5 )
             running = false ;
     }
+    
+    
+    #include <iostream>
+#include <vector>
+
+using namespace std ;
+
+class produs {
+    static int idProdus;
+    int pret;
+    int cantitate;
+public :
+    produs(int pret = 0, int cantitate = 0) {
+        this->pret = pret;
+        this->cantitate = cantitate;
+        idProdus = idProdus + 1;
+    }
+
+    friend istream &operator>>(istream &, produs &);
+    friend ostream &operator<<(ostream &, produs &);
+    virtual void citire(istream &);
+    virtual void afisare(ostream &);
+    int get_cantitate() ;
+};
+
+int produs::get_cantitate() {
+    return this -> cantitate ;
+}
+
+int produs::idProdus = 0 ;
+
+void produs::citire(istream &in) {
+    cout << "Introduceti pretul produsului: " ;
+    in >> this->pret ;
+    cout << "Introduceti cantitatea de produs: " ;
+    in >> this -> cantitate ;
+}
+
+istream& operator>> (istream& in, produs& p) {
+    p.citire(in) ;
+    return in ;
+}
+
+void produs::afisare(ostream &out) {
+    out << "Pretul produsului: " << this->pret << '\n';
+    out << "Cantitatea de produs: " << this -> cantitate << '\n';
+}
+
+ostream& operator<< (ostream& out, produs& p){
+    p.afisare(out) ;
+    return out ;
+}
+
+
+class carte : public produs {
+    string titlu ;
+    int nrAutori ;
+    string autori[10] ;
+    string editura ;
+public :
+    carte(int pret = 0, int cantitate = 0,string titlu = "", int nrAutori = 0 , string autori = "", string editura = "") : produs(pret,cantitate) {
+        this -> titlu = titlu ;
+        this -> nrAutori = nrAutori ;
+        for ( int i = 0 ; i < nrAutori ; ++i )
+            this -> autori[i] = autori[i] ;
+        this -> editura = editura ;
+    }
+    virtual ~carte() {
+        titlu = "";
+        editura = "";
+    }
+    friend istream& operator>> (istream&, carte&) ;
+    friend ostream& operator<< (ostream&, carte& ) ;
+    void citire(istream&) ;
+    void afisare(ostream&) ;
+    string getTitlu() ;
+    void setTitlu(string) ;
+    int getNrAutori() ;
+    void setNrAutori(int) ;
+    string* getAutori() ;
+    void setAutori(string[]) ;
+    string getEditura();
+    void setEditura(string) ;
+    void operator= (carte& ) ;
+};
+
+void carte::citire(istream &in) {
+    produs::citire(in) ;
+    cout << "Introduceti titlul cartii: " ;
+    in >> this -> titlu ;
+    cout << "Introduceti numarul de autori: " ;
+    in >> this -> nrAutori ;
+    cout << "Introduceti autorii: " << '\n';
+    for ( int i = 1 ; i <= nrAutori ; ++i ) {
+        cout << i << ": " ;
+        in >> this -> autori[i] ;
+    }
+    cout << "Introduceti editura: " ;
+    in >> this -> editura ;
+}
+
+istream& operator>> (istream& in, carte& c) {
+    c.citire(in) ;
+    return in ;
+}
+
+void carte::afisare(ostream &out) {
+    produs::afisare(out) ;
+    cout << "Titlul cartii: " <<  this -> titlu << '\n' ;
+    cout << "Numarul de autori: " << this -> nrAutori << '\n' ;
+    cout << "Autorii: " << '\n';
+    for ( int i = 1 ; i <= nrAutori ; ++i )
+        cout << i << ": " << this -> autori[i] << '\n';
+    cout << "Editura: " <<  this -> editura;
+}
+
+ostream& operator<< (ostream& out, carte& c) {
+    c.afisare(out) ;
+    return out ;
+}
+
+string carte::getTitlu() {
+    return this -> titlu ;
+}
+
+void carte::setTitlu(string titlu) {
+    this -> titlu = titlu ;
+}
+
+int carte::getNrAutori() {
+    return this -> nrAutori ;
+}
+
+void carte::setNrAutori(int nrAutori) {
+    this -> nrAutori = nrAutori ;
+}
+
+string* carte::getAutori() {
+    return this->autori ;
+}
+
+void carte::setAutori(string autori[]) {
+    for ( int i = 1 ; i <= this -> getNrAutori() ; ++i)
+        this -> autori[i] = autori[i] ;
+}
+
+string carte::getEditura() {
+    return this -> editura ;
+}
+
+void carte::setEditura(string editura) {
+    this -> editura = editura ;
+}
+
+void carte::operator=(carte &c) {
+    this -> setTitlu(c.getTitlu()) ;
+    this ->setNrAutori(c.getNrAutori()) ;
+    this -> setAutori(c.getAutori()) ;
+    this -> setEditura(c.getEditura()) ;
+}
+
+class DVD : public produs {
+    int nrMinute ;
+public :
+    DVD(int pret = 0, int cantitate = 0,int nrMinute = 0) : produs(pret, cantitate) {
+        this -> nrMinute = nrMinute ;
+    }
+    friend istream& operator>> (istream&, DVD&) ;
+    friend ostream& operator<< (ostream&, DVD& ) ;
+    void citire(istream&) ;
+    void afisare(ostream&) ;
+};
+
+void DVD::citire(istream &in) {
+    produs::citire(in) ;
+    cout << "Numarul de minute al DVD-ului: " ;
+    in >> this -> nrMinute ;
+}
+
+istream& operator>> (istream& in, DVD& d) {
+    d.citire(in) ;
+    return in ;
+}
+
+void DVD::afisare(ostream &out) {
+    produs::afisare(out) ;
+    cout << "Numarul de minute al DVD-ului: " << this -> nrMinute << '\n' ;
+}
+
+ostream& operator<< (ostream& out, DVD& d) {
+    d.afisare(out) ;
+    return out ;
+}
+
+class DVD_Music : public DVD {
+    string numeAlbum ;
+    int nrInterpreti ;
+    string interpreti[10] ;
+public :
+    DVD_Music(int pret = 0, int cantitate = 0,int nrMinute = 0, string numeAlbum = "" , int nrInterpreti = 0 ,string interpreti = "") : DVD(pret,cantitate, nrMinute) {
+        this -> numeAlbum = numeAlbum ;
+        this -> nrInterpreti = nrInterpreti ;
+        for ( int i = 1 ; i <= nrInterpreti ; ++i )
+            this -> interpreti[i] = interpreti[i] ;
+    }
+    ~DVD_Music() {
+        numeAlbum = "" ;
+    }
+    friend istream& operator>> (istream&, DVD_Music&) ;
+    friend ostream& operator<< (ostream&, DVD_Music& ) ;
+    void citire(istream&) ;
+    void afisare(ostream&) ;
+};
+
+void DVD_Music::citire(istream& in) {
+    DVD::citire(in) ;
+    cout << "Introduceti numele albumului: " ;
+    in >> this -> numeAlbum ;
+    cout << "Introduceti numarul de interpreti: " ;
+    in >> this -> nrInterpreti ;
+    cout << "Introduceti interpretii: " << '\n' ;
+    for ( int i = 1 ; i <= nrInterpreti ; ++i ) {
+        cout << i << ": " ;
+        in >> this -> interpreti[i];
+    }
+}
+
+istream& operator>> (istream& in,  DVD_Music& d ) {
+    d.citire(in) ;
+    return in ;
+}
+
+void DVD_Music::afisare(ostream& out) {
+    DVD::afisare(out) ;
+    out << "Numele albumului: " ;
+    out << this -> numeAlbum << '\n' ;
+    out << "Numarul de interpreti: " ;
+    out <<  this -> nrInterpreti << '\n';
+    out << "Interpreti: " << '\n' ;
+    for ( int i = 1 ; i <= nrInterpreti ; ++i ) {
+        out << i << ": " ;
+        out << this -> interpreti[i] << '\n';
+    }
+}
+
+ostream& operator<< (ostream& out, DVD_Music& d) {
+    d.afisare(out) ;
+    return out ;
+}
+
+class DVD_Film : public DVD {
+    string numeFilm ;
+    string genFilm ;
+public :
+    DVD_Film(int pret = 0, int cantitate = 0,int nrMinute = 0, string numeFilm = "", string genFilm = "") : DVD(pret, cantitate, nrMinute) {
+        this -> numeFilm = numeFilm ;
+        this -> genFilm = genFilm ;
+    }
+    ~DVD_Film() {
+        numeFilm = "" ;
+        genFilm = "" ;
+    }
+    friend istream& operator>> (istream&, DVD_Film&) ;
+    friend ostream& operator<< (ostream&, DVD_Film& ) ;
+    void citire(istream&) ;
+    void afisare(ostream&) ;
+};
+
+void DVD_Film::citire(istream &in) {
+    DVD::citire(in) ;
+    cout << "Introduceti numele filmului : " ;
+    in >> this -> numeFilm ;
+    cout << "Introduceti genul filmului : "  ;
+    in >> this -> genFilm ;
+}
+
+istream& operator>> (istream& in, DVD_Film& d) {
+    d.citire(in) ;
+    return in ;
+}
+
+void DVD_Film::afisare(ostream &out) {
+    DVD::afisare(out) ;
+    out << "Introduceti numele filmului : " ;
+    out << this -> numeFilm << '\n' ;
+    out << "Introduceti genul filmului : "  ;
+    out << this -> genFilm << '\n' ;
+}
+
+class colectie : public produs {
+    string denumire ;
+public :
+};
+
+class figurina : public colectie {
+    string categorie ;
+    string brand ;
+    string material ;
+public :
+};
+
+class poster : public colectie {
+    string format ;
+public :
+};
+
+class librarie {
+    vector<produs *> produse;
+public :
+    void adaugare();
+    void afisare();
+    void cautare() ;
+    void cautareDupaStoc() ;
+};
+
+void librarie::adaugare() {
+    int tipObiect ;
+    cout << "Introduceti tipul obiectului pe care doriti sa il adaugati: " << endl ;
+    cout << "1 - Carte " << endl ;
+    cout << "2 - DVD-Music" << endl ;
+    cout << "3 - DVD-Film" << endl ;
+    cout << "Introduceti tipul: " ;
+    cin >> tipObiect ;
+    if ( tipObiect == 1 ) {
+        carte *c = new carte;
+        cin >> *c ;
+        produse.push_back(c) ;
+    }
+    if ( tipObiect == 2 ) {
+        DVD_Music *d = new DVD_Music;
+        cin >> *d ;
+        produse.push_back(d) ;
+    }
+    if ( tipObiect == 3 ) {
+        DVD_Film *d = new DVD_Film;
+        cin >> *d ;
+        produse.push_back(d) ;
+    }
+}
+
+void librarie::afisare() {
+    for (int i = 0 ; i < produse.size() ; ++i ) {
+        produs *p = produse[i] ;
+        if ( typeid(*p) == typeid(carte) ) {
+            carte* c = static_cast <carte*> (p) ;
+            cout << *c << endl;
+        }
+        if ( typeid(*p) == typeid(DVD_Music) ) {
+            DVD_Music* d = static_cast <DVD_Music*> (p) ;
+            cout << *d << endl;
+        }
+        cout << endl ;
+    }
+}
+
+void librarie::cautare() {
+    string nume ;
+    bool found = 0 ;
+    cout << "Introduceti numele cartii cautate: " ;
+    cin >> nume ;
+    for ( int i = 0 ; i < produse.size() ; ++i ) {
+        produs *p = produse[i] ;
+        if ( typeid(*p) == typeid(carte) ) {
+            carte* c = static_cast <carte*> (p) ;
+            if ( c -> getTitlu() == nume ) {
+                cout << *c << endl;
+                found = 1;
+            }
+        }
+    }
+    if ( found == 0 ) {
+        cout << "------Nu exista cartea-------" << endl ;
+    }
+}
+
+void librarie::cautareDupaStoc() {
+    int vmax = 0 ;
+    vector <produs*> rezultat ;
+    for ( int i = 0 ; i < produse.size() ; ++i ) {
+        produs *p = produse[i] ;
+        if ( p -> get_cantitate() > vmax) {
+            vmax = p -> get_cantitate() ;
+            rezultat.clear() ;
+        }
+        if ( p -> get_cantitate() == vmax )
+            rezultat.push_back(p) ;
+    }
+    for (int i = 0 ; i < rezultat.size() ; ++i)
+        cout << *rezultat[i] << endl ;
+
+}
+
+int main() {
+    librarie l ;
+    int optiune ;
+    while (true) {
+        cout << "Introduceti optiunea: " << endl ;
+        cout << "1 - Adaugarea unui obiect" << endl ;
+        cout << "2 - Afisarea obiectelor din librarie" << endl ;
+        cout << "3 - Cautarea unei carti dupa titlu" << endl ;
+        cout << "4 - Cautarea produsului cu cel mai mare stoc" << endl ;
+        cout << "5 - Iesire" << endl ;
+        cout << "Optiune : " ;
+        cin >> optiune ;
+        if ( optiune == 1 )
+            l.adaugare() ;
+        if ( optiune == 2 )
+            l.afisare() ;
+        if ( optiune == 3 )
+            l.cautare() ;
+        if ( optiune == 4 )
+            l.cautareDupaStoc() ;
+        if ( optiune == 5 )
+            break ;
+    }
+
+}
+
 }
